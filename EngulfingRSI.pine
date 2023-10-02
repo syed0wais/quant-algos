@@ -1,0 +1,24 @@
+//@version=5
+indicator('Layzee - EngulfingCandle', overlay=true)
+bullishCandle = close >= open[1] and close[1] < open[1]  //and high >= high[1] and low <= low[1]
+bearishCandle = close <= open[1] and close[1] > open[1]  //and high > high[1] and low < low[1]
+// RSI integration
+rsiSource = input(title='rsiSource', defval=close)
+rsiLenghth = input(title='rsi length', defval=14)
+rsiOverBought = input(title='rsi overbought level', defval=70)
+rsiOverSold = input(title='rsi over sold level', defval=30)
+//rsiOverBoughtThreshold=input(title="rsiOBThreshold level", type=input.integer, defval=97)
+//rsiOverSoldThreshold=input(title="rsiOSThreshold level", type=input.integer, defval=18)
+//get RSI value
+rsiValue = ta.rsi(rsiSource, rsiLenghth)
+isRSIOB = rsiValue >= rsiOverBought and rsiValue
+isRSIOS = rsiValue <= rsiOverSold and rsiValue
+
+tradeSignal = ((isRSIOS or isRSIOS[1] or isRSIOS[2]) and bullishCandle) or ((isRSIOB or isRSIOB[1] or isRSIOB[2]) and bearishCandle)
+//plot on chart
+plotshape(tradeSignal and bullishCandle, title='bullish', location=location.belowbar, color=color.new(color.green, 0), style=shape.triangleup, text='buy')
+plotshape(tradeSignal and bearishCandle, title='bearish', location=location.abovebar, color=color.new(color.red, 0), style=shape.triangledown, text='sell')
+
+// alertcondition(tradeSignal and bullishCandle or tradeSignal and bearishCandle, title='Trade Signal', message='New Trade signal from engulfing script')
+alertcondition(tradeSignal, title="Engulfing Candle Alert", message="Engulfing Candle pattern detected")
+
